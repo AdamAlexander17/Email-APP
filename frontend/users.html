@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - Email App</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+        <div class="nav-left">
+            <div class="nav-brand">
+                <div class="brand-icon">E</div>
+                <div class="brand-text">
+                    <span class="brand-name">Email App</span>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <a href="home.html" class="nav-tab" id="tab-email">
+                    <i class="fa-regular fa-envelope"></i> Email
+                </a>
+                <a href="users.html" class="nav-tab active" id="tab-users">
+                    <i class="fa-solid fa-user"></i> Users
+                </a>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <div class="user-profile">
+                <div class="user-avatar" id="user-avatar">M</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">admin</span>
+                </div>
+            </div>
+            <button class="btn-logout" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </header>
+
+    <!-- Main Content - User Management -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h2>Users</h2>
+                <span class="page-subtitle" id="user-count">0 users</span>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-primary" id="create-user-btn"><i class="fa-solid fa-plus"></i> New User</button>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <!-- Toolbar -->
+            <div class="table-toolbar">
+                <div class="toolbar-left">
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" class="search-input" id="search-input" placeholder="Search users...">
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <span class="rows-label">Rows</span>
+                    <select class="page-size-select" id="page-size-select">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <div class="pagination-compact" id="pagination">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div id="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">USER</th>
+                            <th style="width: 25%;">CREATED</th>
+                            <th style="width: 25%; text-align: right;">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                    </tbody>
+                </table>
+
+                <!-- Loading Overlay -->
+                <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                    <div>
+                        <div class="spinner"></div>
+                        <div class="loading-text">Loading users...</div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <div class="empty-icon"><i class="fa-regular fa-user"></i></div>
+                    <h3>No users found</h3>
+                    <p>Create a new user to get started.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Create User</h3>
+                <button class="modal-close" data-close="create-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-user-form" novalidate>
+                    <div class="form-group">
+                        <label for="create-username">Username</label>
+                        <input type="text" id="create-username" maxlength="50" placeholder="Enter username" required>
+                        <div class="form-error" id="create-username-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="create-password">Password</label>
+                        <input type="password" id="create-password" maxlength="128" placeholder="Min 8 characters" required>
+                        <div class="form-error" id="create-password-error"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-close="create-modal">Cancel</button>
+                <button class="btn btn-primary" id="create-submit-btn">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Edit User</h3>
+                <button class="modal-close" data-close="edit-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-user-form" novalidate>
+                    <input type="hidden" id="edit-user-id">
+                    <div class="form-group">
+                        <label for="edit-username">Username</label>
+                        <input type="text" id="edit-username" maxlength="50" placeholder="Enter username" required>
+                        <div class="form-error" id="edit-username-error"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-close="edit-modal">Cancel</button>
+                <button class="btn btn-primary" id="edit-submit-btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="password-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Change Password</h3>
+                <button class="modal-close" data-close="password-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="password-form" novalidate>
+                    <input type="hidden" id="password-user-id">
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" maxlength="128" placeholder="Min 8 characters" required>
+                        <div class="form-error" id="new-password-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <input type="password" id="confirm-password" maxlength="128" placeholder="Confirm password" required>
+                        <div class="form-error" id="confirm-password-error"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-close="password-modal">Cancel</button>
+                <button class="btn btn-primary" id="password-submit-btn">Update Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal confirm-dialog">
+            <div class="modal-body">
+                <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="confirm-message">Are you sure you want to delete this user?</div>
+                <div class="confirm-sub" id="delete-username-display">This action cannot be undone.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-close="delete-modal">Cancel</button>
+                <button class="btn btn-danger" id="delete-confirm-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>

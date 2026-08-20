@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email - Email App</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+        <div class="nav-left">
+            <div class="nav-brand">
+                <div class="brand-icon">E</div>
+                <div class="brand-text">
+                    <span class="brand-name">Email App</span>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <a href="home.html" class="nav-tab active" id="tab-email">
+                    <i class="fa-regular fa-envelope"></i> Email
+                </a>
+                <a href="users.html" class="nav-tab" id="tab-users">
+                    <i class="fa-solid fa-user"></i> Users
+                </a>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <div class="user-profile">
+                <div class="user-avatar" id="user-avatar">M</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">admin</span>
+                </div>
+            </div>
+            <button class="btn-logout" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </header>
+
+    <!-- Main Content - Email Module -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h2>Email</h2>
+                <span class="page-subtitle" id="email-count">0 emails</span>
+            </div>
+        </div>
+
+        <!-- Email Table Container -->
+        <div class="table-container">
+            <div class="table-toolbar">
+                <div class="toolbar-left">
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" class="search-input" id="search-input" placeholder="Search emails...">
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <span class="rows-label">Rows</span>
+                    <select class="page-size-select" id="page-size-select">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <div class="pagination-compact" id="pagination">
+                    </div>
+                </div>
+            </div>
+
+            <div id="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">FROM</th>
+                            <th style="width: 30%;">SUBJECT</th>
+                            <th style="width: 20%;">TO</th>
+                            <th style="width: 15%;">DATE</th>
+                            <th style="width: 10%; text-align: right;">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="emails-tbody">
+                    </tbody>
+                </table>
+
+                <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                    <div>
+                        <div class="spinner"></div>
+                        <div class="loading-text">Loading emails...</div>
+                    </div>
+                </div>
+
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <div class="empty-icon"><i class="fa-regular fa-envelope"></i></div>
+                    <h3>No emails yet</h3>
+                    <p>Emails received via webhook will appear here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Email Modal -->
+    <div class="modal-overlay" id="view-email-modal">
+        <div class="modal" style="max-width: 640px;">
+            <div class="modal-header">
+                <h3 id="view-email-subject">Email Subject</h3>
+                <button class="modal-close" data-close="view-email-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="email-meta">
+                    <div class="email-meta-row">
+                        <span class="email-meta-label">From:</span>
+                        <span id="view-email-from"></span>
+                    </div>
+                    <div class="email-meta-row">
+                        <span class="email-meta-label">To:</span>
+                        <span id="view-email-to"></span>
+                    </div>
+                    <div class="email-meta-row">
+                        <span class="email-meta-label">Date:</span>
+                        <span id="view-email-date"></span>
+                    </div>
+                </div>
+                <div class="email-body" id="view-email-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/emails.js"></script>
+</body>
+</html>
