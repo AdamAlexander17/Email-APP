@@ -46,6 +46,9 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     user.refresh_token = refresh_token
     db.commit()
 
+    from backend.routers.logs import log_activity
+    log_activity(db, user.username, "User Login", f"User {user.username} logged in")
+
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,

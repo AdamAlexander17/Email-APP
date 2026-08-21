@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 
 from backend.config import CORS_ALLOWED_ORIGINS
 from backend.database import init_db
-from backend.routers import auth, users, emails
+from backend.routers import auth, users, emails, logs
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +35,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(emails.router)
+app.include_router(logs.router)
 
 
 @app.on_event("startup")
@@ -42,6 +43,7 @@ def on_startup():
     """Initialize database tables on application startup."""
     import backend.models.user  # noqa: F401 — ensure models are registered
     import backend.models.email  # noqa: F401
+    import backend.models.log  # noqa: F401
     init_db()
     logger.info("Application startup complete.")
 

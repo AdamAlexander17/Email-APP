@@ -103,7 +103,7 @@
                         <i class="fa-regular fa-pen-to-square"></i>
                     </button>
                     <button class="action-icon" title="Change Password" onclick="openPasswordModal(${user.id})">
-                        <i class="fa-solid fa-key"></i>
+                        <i class="fa-solid fa-lock"></i>
                     </button>
                     <button class="action-icon action-danger" title="Delete" onclick="openDeleteModal(${user.id}, '${escapeAttr(user.username)}')">
                         <i class="fa-regular fa-trash-can"></i>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs - Email App</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+        <div class="nav-left">
+            <div class="nav-brand">
+                <div class="brand-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">Email App</span>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <a href="home.html" class="nav-tab" id="tab-email">
+                    <i class="fa-regular fa-envelope"></i> Email
+                </a>
+                <a href="users.html" class="nav-tab" id="tab-users">
+                    <i class="fa-solid fa-user"></i> Users
+                </a>
+                <a href="logs.html" class="nav-tab active" id="tab-logs">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Logs
+                </a>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <div class="user-profile">
+                <div class="user-avatar" id="user-avatar">M</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">admin</span>
+                </div>
+            </div>
+            <button class="btn-logout" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </header>
+
+    <!-- Main Content - Logs Module -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h2>Logs</h2>
+                <span class="page-subtitle" id="log-count">0 logs</span>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <div class="table-toolbar">
+                <div class="toolbar-left">
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" class="search-input" id="search-input" placeholder="Search logs...">
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <span class="rows-label">Rows</span>
+                    <select class="page-size-select" id="page-size-select">
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <div class="pagination-compact" id="pagination">
+                    </div>
+                </div>
+            </div>
+
+            <div id="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 18%;">USER</th>
+                            <th style="width: 15%;">ACTION</th>
+                            <th style="width: 32%;">DETAILS</th>
+                            <th style="width: 15%;">IP ADDRESS</th>
+                            <th style="width: 20%;">DATE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-tbody">
+                    </tbody>
+                </table>
+
+                <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                    <div>
+                        <div class="spinner"></div>
+                        <div class="loading-text">Loading logs...</div>
+                    </div>
+                </div>
+
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <h3>No activity logs</h3>
+                    <p>Activity logs will appear here as actions are performed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/logs.js"></script>
+</body>
+</html>

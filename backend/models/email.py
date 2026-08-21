@@ -14,4 +14,6 @@ class Email(Base):
     message = Column(Text, nullable=True)
     attachment = Column(Text, nullable=True)
     email_date = Column(DateTime, nullable=True)
+    status = Column(String(20), nullable=False, default="Pending")
+    comment = Column(Text, nullable=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now())

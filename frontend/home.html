@@ -12,7 +12,7 @@
     <header class="top-navbar">
         <div class="nav-left">
             <div class="nav-brand">
-                <div class="brand-icon">E</div>
+                <div class="brand-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
                 <div class="brand-text">
                     <span class="brand-name">Email App</span>
                 </div>
@@ -23,6 +23,9 @@
                 </a>
                 <a href="users.html" class="nav-tab" id="tab-users">
                     <i class="fa-solid fa-user"></i> Users
+                </a>
+                <a href="logs.html" class="nav-tab" id="tab-logs">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Logs
                 </a>
             </nav>
         </div>
@@ -72,10 +75,14 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">FROM</th>
-                            <th style="width: 30%;">SUBJECT</th>
-                            <th style="width: 20%;">TO</th>
-                            <th style="width: 15%;">DATE</th>
+                            <th style="width: 18%;">FROM</th>
+                            <th style="width: 12%;">SUBJECT</th>
+                            <th style="width: 8%;">BRAND</th>
+                            <th style="width: 14%;">MESSAGE</th>
+                            <th style="width: 9%;">ATTACHMENT</th>
+                            <th style="width: 10%;">COMMENT</th>
+                            <th style="width: 7%;">STATUS</th>
+                            <th style="width: 12%;">DATE</th>
                             <th style="width: 10%; text-align: right;">ACTIONS</th>
                         </tr>
                     </thead>
@@ -95,6 +102,49 @@
                     <h3>No emails yet</h3>
                     <p>Emails received via webhook will appear here.</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comment Modal -->
+    <div class="modal-overlay" id="comment-modal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3><i class="fa-regular fa-comment"></i> Add Comment</h3>
+                <button class="modal-close" data-close="comment-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="comment-form" novalidate>
+                    <input type="hidden" id="comment-email-id">
+                    <div class="form-group">
+                        <label for="comment-text">Comment</label>
+                        <textarea id="comment-text" rows="4" style="width:100%; padding:0.6rem 0.75rem; font-size:0.9rem; font-family:var(--font-family); border:1px solid var(--color-border); border-radius:var(--border-radius-sm); resize:vertical;" placeholder="Enter your comment..."></textarea>
+                        <div class="form-error" id="comment-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment-status">Status</label>
+                        <select id="comment-status" style="width:100%; padding:0.6rem 0.75rem; font-size:0.9rem; border:1px solid var(--color-border); border-radius:var(--border-radius-sm);">
+                            <option value="Pending">Pending</option>
+                            <option value="Resolved" selected>Resolved</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-close="comment-modal">Cancel</button>
+                <button class="btn btn-primary" id="comment-submit-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attachment Viewer Modal -->
+    <div class="modal-overlay" id="attachment-modal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-paperclip"></i> Attachment</h3>
+                <button class="modal-close" data-close="attachment-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="attachment-content" style="padding: 1rem; min-height: 200px;">
             </div>
         </div>
     </div>

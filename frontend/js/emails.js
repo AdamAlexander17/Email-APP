@@ -83,7 +83,16 @@
             const fromDisplay = email.from_name || email.from_email;
             const initial = fromDisplay.charAt(0).toUpperCase();
             const color = colors[email.id % colors.length];
-            const dateStr = email.email_date ? formatDate(email.email_date) : formatDate(email.created_at);
+            const dateStr = email.email_date ? formatDateTime(email.email_date) : formatDateTime(email.created_at);
+            const brandName = extractBrand(email.to_email);
+            const messagePreview = email.message ? email.message.substring(0, 50) + (email.message.length > 50 ? '...' : '') : '';
+            const attachmentHtml = email.attachment
+                ? `<a href="javascript:void(0)" class="attachment-link" onclick="event.stopPropagation(); viewAttachment(atob('${btoa(email.attachment)}'))"><i class="fa-solid fa-paperclip"></i> ${countAttachments(email.attachment)} file${countAttachments(email.attachment) > 1 ? 's' : ''}</a>`
+                : '<span class="no-attachment">—</span>';
+
+            const statusClass = (email.status || 'Pending') === 'Resolved' ? 'status-resolved' : 'status-pending';
+            const statusText = email.status || 'Pending';
+            const commentPreview = email.comment ? email.comment.substring(0, 30) + (email.comment.length > 30 ? '...' : '') : '—';
 
             return `
             <tr onclick="viewEmail(${email.id})" style="cursor: pointer;">
@@ -97,9 +106,16 @@
                     </div>
                 </td>
                 <td class="email-subject-cell">${escapeHtml(email.subject || '(No Subject)')}</td>
-                <td class="email-to-cell">${escapeHtml(email.to_email)}</td>
+                <td><span class="brand-badge">${escapeHtml(brandName)}</span></td>
+                <td class="message-preview-cell">${escapeHtml(messagePreview)}</td>
+                <td>${attachmentHtml}</td>
+                <td class="comment-cell">${escapeHtml(commentPreview)}</td>
+                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td>${dateStr}</td>
-                <td class="actions-cell" style="justify-content: flex-end;">
+                <td class="actions-cell">
+                    <button class="action-icon" title="Comment" onclick="event.stopPropagation(); openCommentModal(${email.id}, '${escapeAttr(email.comment || '')}', '${escapeAttr(email.status || 'Pending')}')">
+                        <i class="fa-regular fa-message"></i>
+                    </button>
                     <button class="action-icon" title="View" onclick="event.stopPropagation(); viewEmail(${email.id})">
                         <i class="fa-regular fa-eye"></i>
                     </button>
@@ -109,6 +125,29 @@
                 </td>
             </tr>`;
         }).join('');
+    }
+
+    // Extract brand name from email: info@tradekaro.com → Tradekaro
+    function extractBrand(email) {
+        if (!email) return '';
+        const match = email.match(/@([^.]+)/);
+        if (match) {
+            return match[1].charAt(0).toUpperCase() + match[1].slice(1);
+        }
+        return email;
+    }
+
+    // Format date with time in IST (already stored as IST in DB)
+    function formatDateTime(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const mins = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${mins}`;
     }
 
     function renderPagination() {
@@ -215,12 +254,128 @@
         });
     });
 
+    // ==================== Comment ====================
+
+    window.openCommentModal = function (id, existingComment, existingStatus) {
+        document.getElementById('comment-email-id').value = id;
+        document.getElementById('comment-text').value = existingComment || '';
+        document.getElementById('comment-status').value = existingStatus || 'Resolved';
+        document.getElementById('comment-modal').classList.add('active');
+    };
+
+    document.getElementById('comment-submit-btn').addEventListener('click', async function () {
+        const emailId = document.getElementById('comment-email-id').value;
+        const comment = document.getElementById('comment-text').value.trim();
+        const status = document.getElementById('comment-status').value;
+
+        if (!comment) {
+            document.getElementById('comment-error').textContent = 'Comment is required';
+            document.getElementById('comment-error').classList.add('visible');
+            return;
+        }
+        document.getElementById('comment-error').textContent = '';
+        document.getElementById('comment-error').classList.remove('visible');
+
+        setLoading(this, true);
+        try {
+            await apiRequest(`/api/emails/${emailId}/comment`, {
+                method: 'PUT',
+                body: JSON.stringify({ comment, status })
+            });
+            showToast('Comment saved', 'success');
+            document.getElementById('comment-modal').classList.remove('active');
+            fetchEmails();
+        } catch (error) {
+            showToast(error.message || 'Could not save comment', 'error');
+        } finally {
+            setLoading(this, false);
+        }
+    });
+
+    // ==================== View Attachment ====================
+
+    window.viewAttachment = function (attachmentData) {
+        const modal = document.getElementById('attachment-modal');
+        const content = document.getElementById('attachment-content');
+
+        // Parse multiple attachments (could be comma-separated URLs, JSON array, or single URL)
+        let urls = [];
+        try {
+            // Try JSON array first
+            const parsed = JSON.parse(attachmentData);
+            if (Array.isArray(parsed)) {
+                urls = parsed.map(item => typeof item === 'string' ? item : item.url || item.file_url || item.File_Url || '');
+            } else if (typeof parsed === 'object') {
+                urls = [parsed.url || parsed.file_url || parsed.File_Url || attachmentData];
+            }
+        } catch (e) {
+            // Not JSON — split by comma or newline
+            urls = attachmentData.split(/[,\n]+/).map(u => u.trim()).filter(u => u.length > 0);
+        }
+
+        if (urls.length === 0) {
+            content.innerHTML = '<p style="text-align:center; padding:2rem; color:var(--color-text-secondary);">No attachments found</p>';
+            modal.classList.add('active');
+            return;
+        }
+
+        let html = '<div class="attachment-grid">';
+        urls.forEach((url, index) => {
+            const lower = url.toLowerCase();
+            if (lower.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/)) {
+                html += `
+                    <div class="attachment-item">
+                        <img src="${url}" alt="Attachment ${index + 1}" class="attachment-image">
+                        <div class="attachment-item-footer">
+                            <span class="attachment-label"><i class="fa-regular fa-image"></i> Image ${index + 1}</span>
+                            <a href="${url}" download class="attachment-download"><i class="fa-solid fa-download"></i></a>
+                        </div>
+                    </div>`;
+            } else if (lower.match(/\.(pdf)(\?|$)/)) {
+                html += `
+                    <div class="attachment-item attachment-item-full">
+                        <iframe src="${url}" class="attachment-pdf"></iframe>
+                        <div class="attachment-item-footer">
+                            <span class="attachment-label"><i class="fa-regular fa-file-pdf"></i> PDF ${index + 1}</span>
+                            <a href="${url}" download class="attachment-download"><i class="fa-solid fa-download"></i></a>
+                        </div>
+                    </div>`;
+            } else {
+                const filename = url.split('/').pop().split('?')[0] || `File ${index + 1}`;
+                html += `
+                    <div class="attachment-item attachment-item-file">
+                        <div class="attachment-file-icon"><i class="fa-solid fa-file"></i></div>
+                        <span class="attachment-filename">${filename}</span>
+                        <a href="${url}" download class="btn btn-sm btn-primary"><i class="fa-solid fa-download"></i> Download</a>
+                    </div>`;
+            }
+        });
+        html += '</div>';
+
+        content.innerHTML = html;
+        modal.classList.add('active');
+    };
+
     // ==================== Utility ====================
 
     function escapeHtml(str) {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    function countAttachments(attachmentData) {
+        if (!attachmentData) return 0;
+        try {
+            const parsed = JSON.parse(attachmentData);
+            if (Array.isArray(parsed)) return parsed.length;
+        } catch (e) {}
+        const urls = attachmentData.split(/[,\n]+/).filter(u => u.trim().length > 0);
+        return urls.length || 1;
+    }
+
+    function escapeAttr(str) {
+        return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
     }
 
     // ==================== Init ====================

@@ -381,9 +381,12 @@ a:hover {
 
 .data-table td {
   padding: 0.75rem 1.25rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   border-bottom: 1px solid #f0f0f0;
   vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .data-table tbody tr:nth-child(even) {
@@ -400,8 +403,10 @@ a:hover {
 
 .data-table .actions-cell {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 /* Action icon buttons (like screenshot) */
@@ -1126,4 +1131,174 @@ a:hover {
   line-height: 1.7;
   white-space: pre-wrap;
   color: var(--color-text-primary);
+}
+
+/* --- Brand Badge --- */
+.brand-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: #e8f4fd;
+  color: #1a73e8;
+  text-transform: capitalize;
+}
+
+/* --- Status Badge --- */
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-received {
+  background: #f0f9f4;
+  color: #27ae60;
+}
+
+.status-read {
+  background: #f0f4ff;
+  color: #4a90d9;
+}
+
+/* --- Message Preview --- */
+.message-preview-cell {
+  color: var(--color-text-secondary);
+  font-size: 0.83rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* --- Attachment Link --- */
+.attachment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition);
+}
+
+.attachment-link:hover {
+  background: #f0f4ff;
+  text-decoration: none;
+}
+
+.no-attachment {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+/* --- Attachment Grid in Modal --- */
+.attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.attachment-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background: #fafbfc;
+}
+
+.attachment-item-full {
+  grid-column: 1 / -1;
+}
+
+.attachment-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  display: block;
+  background: #f5f5f5;
+  padding: 0.5rem;
+}
+
+.attachment-pdf {
+  width: 100%;
+  height: 500px;
+  border: none;
+}
+
+.attachment-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-card-bg);
+}
+
+.attachment-label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.attachment-download {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-primary);
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.attachment-download:hover {
+  background: #f0f4ff;
+}
+
+.attachment-item-file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.attachment-file-icon {
+  font-size: 2.5rem;
+  color: var(--color-primary);
+}
+
+.attachment-filename {
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+  word-break: break-all;
+}
+
+/* --- Status Pending/Resolved --- */
+.status-pending {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.status-resolved {
+  background: #f0f9f4;
+  color: #27ae60;
+}
+
+/* --- Comment Cell --- */
+.comment-cell {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
 }

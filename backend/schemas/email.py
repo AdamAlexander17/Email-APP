@@ -33,7 +33,16 @@ class EmailResponse(BaseModel):
     message: Optional[str]
     attachment: Optional[str]
     email_date: Optional[datetime]
+    status: str
+    comment: Optional[str]
     created_at: datetime
+
+
+class EmailCommentUpdate(BaseModel):
+    """Schema for updating email comment and status."""
+
+    comment: str
+    status: Optional[str] = "Resolved"
 
 
 class PaginatedEmailsResponse(BaseModel):

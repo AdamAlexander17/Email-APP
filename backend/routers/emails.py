@@ -12,6 +12,7 @@ from backend.database import get_db
 from backend.dependencies.auth import get_current_user
 from backend.models.email import Email
 from backend.schemas.email import (
+    EmailCommentUpdate,
     EmailResponse,
     GmailWebhookRequest,
     PaginatedEmailsResponse,
@@ -27,15 +28,34 @@ def receive_gmail_webhook(
 ):
     """
     Receive email data from Gmail webhook.
-    This endpoint is public (no auth required) since it's called by external service.
+    Public endpoint - called by Integrately.
     """
     # Parse the date if provided
     email_date = None
     if payload.date:
         try:
+            # Try ISO format first (2026-08-20T10:00:00Z)
             email_date = datetime.fromisoformat(payload.date.replace("Z", "+00:00"))
         except (ValueError, TypeError):
-            email_date = None
+            try:
+                # Try RFC 2822 format (Fri, 21 Aug 2026 04:39:06 -0700)
+                from email.utils import parsedate_to_datetime
+                email_date = parsedate_to_datetime(payload.date)
+            except (ValueError, TypeError):
+                try:
+                    # Try common formats
+                    from dateutil import parser as dateparser
+                    email_date = dateparser.parse(payload.date)
+                except Exception:
+                    email_date = None
+
+        # Convert to IST (UTC+5:30) for storage
+        if email_date is not None:
+            from datetime import timezone, timedelta
+            ist = timezone(timedelta(hours=5, minutes=30))
+            if email_date.tzinfo is not None:
+                email_date = email_date.astimezone(ist).replace(tzinfo=None)
+            # else: assume already local, keep as-is
 
     email = Email(
         from_email=payload.from_email,
@@ -115,3 +135,26 @@ def delete_email(
         raise HTTPException(status_code=404, detail="Email not found")
     db.delete(email)
     db.commit()
+
+
+@router.put("/emails/{email_id}/comment", response_model=EmailResponse)
+def update_email_comment(
+    email_id: int,
+    data: EmailCommentUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """Add/update comment and change status."""
+    email = db.query(Email).filter(Email.id == email_id).first()
+    if not email:
+        raise HTTPException(status_code=404, detail="Email not found")
+    email.comment = data.comment
+    email.status = data.status or "Resolved"
+    db.commit()
+
+    from backend.routers.logs import log_activity
+    username = current_user.get("username", "Unknown")
+    log_activity(db, username, "Email Resolved", f"Commented on email #{email_id}: {data.comment[:50]}")
+
+    db.refresh(email)
+    return email
