@@ -30,6 +30,8 @@
     let pageSize = 10;
     let searchFilter = '';
     let totalEmails = 0;
+    let sortBy = 'created_at';
+    let sortDir = 'desc';
 
     // DOM Elements
     const tbody = document.getElementById('emails-tbody');
@@ -48,6 +50,8 @@
             const params = new URLSearchParams({
                 page: currentPage,
                 size: pageSize,
+                sort_by: sortBy,
+                sort_dir: sortDir,
             });
             if (searchFilter) {
                 params.set('search', searchFilter);
@@ -408,6 +412,33 @@
 
     function escapeAttr(str) {
         return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+    }
+
+    // ==================== Sorting ====================
+
+    window.sortEmails = function (column) {
+        if (sortBy === column) {
+            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortBy = column;
+            sortDir = 'asc';
+        }
+        currentPage = 1;
+        fetchEmails();
+        updateSortIndicators();
+    };
+
+    function updateSortIndicators() {
+        document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
+            const col = th.dataset.sort;
+            const icon = th.querySelector('.sort-icon');
+            if (!icon) return;
+            if (col === sortBy) {
+                icon.className = sortDir === 'asc' ? 'fa-solid fa-sort-up sort-icon active' : 'fa-solid fa-sort-down sort-icon active';
+            } else {
+                icon.className = 'fa-solid fa-sort sort-icon';
+            }
+        });
     }
 
     // ==================== Init ====================

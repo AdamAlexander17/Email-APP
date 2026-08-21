@@ -75,15 +75,15 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th style="width: 16%;">FROM</th>
-                            <th style="width: 11%;">SUBJECT</th>
+                            <th style="width: 16%; cursor:pointer;" data-sort="from_email" onclick="sortEmails('from_email')">FROM <i class="fa-solid fa-sort sort-icon"></i></th>
+                            <th style="width: 11%; cursor:pointer;" data-sort="subject" onclick="sortEmails('subject')">SUBJECT <i class="fa-solid fa-sort sort-icon"></i></th>
                             <th style="width: 7%;">BRAND</th>
                             <th style="width: 12%;">MESSAGE</th>
                             <th style="width: 7%;">ATTACHMENT</th>
                             <th style="width: 9%;">COMMENT</th>
-                            <th style="width: 6%;">STATUS</th>
+                            <th style="width: 6%; cursor:pointer;" data-sort="status" onclick="sortEmails('status')">STATUS <i class="fa-solid fa-sort sort-icon"></i></th>
                             <th style="width: 9%;">RESOLUTION TIME</th>
-                            <th style="width: 11%;">DATE</th>
+                            <th style="width: 11%; cursor:pointer;" data-sort="created_at" onclick="sortEmails('created_at')">DATE <i class="fa-solid fa-sort-down sort-icon active"></i></th>
                             <th style="width: 12%; text-align: right;">ACTIONS</th>
                         </tr>
                     </thead>

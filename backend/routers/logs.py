@@ -21,6 +21,8 @@ def list_logs(
     page: int = Query(default=1, ge=1),
     size: int = Query(default=20, ge=5, le=100),
     search: Optional[str] = Query(default=None),
+    sort_by: Optional[str] = Query(default="created_at"),
+    sort_dir: Optional[str] = Query(default="desc"),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
@@ -30,6 +32,21 @@ def list_logs(
         query = query.filter(
             (ActivityLog.user.ilike(f)) | (ActivityLog.action.ilike(f)) | (ActivityLog.details.ilike(f))
         )
+
+    # Sorting
+    allowed_sort = {
+        "user": ActivityLog.user,
+        "action": ActivityLog.action,
+        "details": ActivityLog.details,
+        "ip_address": ActivityLog.ip_address,
+        "created_at": ActivityLog.created_at,
+    }
+    sort_column = allowed_sort.get(sort_by, ActivityLog.created_at)
+    if sort_dir == "asc":
+        query = query.order_by(sort_column.asc())
+    else:
+        query = query.order_by(sort_column.desc())
+
     total = query.count()
-    logs = query.order_by(ActivityLog.created_at.desc()).offset((page - 1) * size).limit(size).all()
+    logs = query.offset((page - 1) * size).limit(size).all()
     return PaginatedLogsResponse(logs=logs, total=total, page=page, size=size)

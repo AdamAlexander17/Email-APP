@@ -88,12 +88,15 @@ def list_emails(
     page: int = Query(default=1, ge=1),
     size: int = Query(default=10, ge=5, le=100),
     search: Optional[str] = Query(default=None),
+    sort_by: Optional[str] = Query(default="created_at"),
+    sort_dir: Optional[str] = Query(default="desc"),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
     """
     Retrieve a paginated list of emails. Requires authentication.
     Supports search by from_email, from_name, or subject.
+    Supports sorting by any column.
     """
     query = db.query(Email)
 
@@ -105,10 +108,26 @@ def list_emails(
             | (Email.subject.ilike(search_filter))
         )
 
+    # Sorting
+    allowed_sort = {
+        "from_email": Email.from_email,
+        "from_name": Email.from_name,
+        "subject": Email.subject,
+        "to_email": Email.to_email,
+        "status": Email.status,
+        "email_date": Email.email_date,
+        "created_at": Email.created_at,
+        "resolved_at": Email.resolved_at,
+    }
+    sort_column = allowed_sort.get(sort_by, Email.created_at)
+    if sort_dir == "asc":
+        query = query.order_by(sort_column.asc())
+    else:
+        query = query.order_by(sort_column.desc())
+
     total = query.count()
     emails = (
-        query.order_by(Email.email_date.desc(), Email.created_at.desc())
-        .offset((page - 1) * size)
+        query.offset((page - 1) * size)
         .limit(size)
         .all()
     )

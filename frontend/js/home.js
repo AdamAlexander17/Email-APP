@@ -35,6 +35,8 @@
     let searchFilter = '';
     let totalUsers = 0;
     let deleteTargetId = null;
+    let sortBy = 'id';
+    let sortDir = 'asc';
 
     // DOM Elements
     const tbody = document.getElementById('users-tbody');
@@ -53,8 +55,8 @@
             const params = new URLSearchParams({
                 page: currentPage,
                 size: pageSize,
-                sort_by: 'id',
-                sort_dir: 'asc'
+                sort_by: sortBy,
+                sort_dir: sortDir
             });
             if (searchFilter) {
                 params.set('username', searchFilter);
@@ -371,6 +373,33 @@
 
     function escapeAttr(str) {
         return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // ==================== Sorting ====================
+
+    window.sortUsers = function (column) {
+        if (sortBy === column) {
+            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortBy = column;
+            sortDir = 'asc';
+        }
+        currentPage = 1;
+        fetchUsers();
+        updateSortIndicators();
+    };
+
+    function updateSortIndicators() {
+        document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
+            const col = th.dataset.sort;
+            const icon = th.querySelector('.sort-icon');
+            if (!icon) return;
+            if (col === sortBy) {
+                icon.className = sortDir === 'asc' ? 'fa-solid fa-sort-up sort-icon active' : 'fa-solid fa-sort-down sort-icon active';
+            } else {
+                icon.className = 'fa-solid fa-sort sort-icon';
+            }
+        });
     }
 
     // ==================== Init ====================
