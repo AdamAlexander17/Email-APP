@@ -111,17 +111,13 @@
         return 'status-resolved';
     }
 
+    // Format date with time - server stores Dubai time (UTC+4) as naive datetime
+    // Parse the ISO string directly to avoid browser timezone conversion
     function formatDateTime(dateString) {
         if (!dateString) return '';
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString;
-        // Add 4 hours for Dubai timezone (server stores UTC)
-        const dubai = new Date(date.getTime() + (4 * 60 * 60 * 1000));
-        const year = dubai.getUTCFullYear();
-        const month = String(dubai.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(dubai.getUTCDate()).padStart(2, '0');
-        const hours = String(dubai.getUTCHours()).padStart(2, '0');
-        const mins = String(dubai.getUTCMinutes()).padStart(2, '0');
+        const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+        if (!match) return dateString;
+        const [, year, month, day, hours, mins] = match;
         return `${year}-${month}-${day} ${hours}:${mins}`;
     }
 

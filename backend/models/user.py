@@ -3,6 +3,13 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, func, text
 from backend.database import Base
 
 
+def _dubai_now():
+    """Return current Dubai time (UTC+4) as naive datetime."""
+    from datetime import datetime, timezone, timedelta
+    dubai = timezone(timedelta(hours=4))
+    return datetime.now(dubai).replace(tzinfo=None)
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -11,5 +18,5 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     access_token = Column(Text, nullable=True)
     refresh_token = Column(Text, nullable=True)
-    created_at = Column(DateTime, nullable=False, server_default=text("(NOW() + INTERVAL 4 HOUR)"))
-    updated_at = Column(DateTime, nullable=False, server_default=text("(NOW() + INTERVAL 4 HOUR)"), onupdate=func.now())
+    created_at = Column(DateTime, nullable=False, default=_dubai_now)
+    updated_at = Column(DateTime, nullable=False, default=_dubai_now, onupdate=_dubai_now)

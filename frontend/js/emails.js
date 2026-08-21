@@ -139,18 +139,15 @@
         return email;
     }
 
-    // Format date with time in Dubai (UTC+4)
+    // Format date with time - server stores Dubai time (UTC+4) as naive datetime
+    // We parse the ISO string directly to avoid browser timezone conversion
     function formatDateTime(dateString) {
         if (!dateString) return '';
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString;
-        // Add 4 hours for Dubai timezone (server stores UTC)
-        const dubai = new Date(date.getTime() + (4 * 60 * 60 * 1000));
-        const year = dubai.getUTCFullYear();
-        const month = String(dubai.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(dubai.getUTCDate()).padStart(2, '0');
-        const hours = String(dubai.getUTCHours()).padStart(2, '0');
-        const mins = String(dubai.getUTCMinutes()).padStart(2, '0');
+        // dateString comes as "2026-08-21T09:45:00" (no timezone)
+        // Parse directly from the string to avoid any timezone shifting
+        const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+        if (!match) return dateString;
+        const [, year, month, day, hours, mins] = match;
         return `${year}-${month}-${day} ${hours}:${mins}`;
     }
 
@@ -369,10 +366,16 @@
     }
 
     // Calculate resolution time between email received and resolved
+    // Both dates are stored as Dubai time (naive), so we parse them as UTC
+    // to get a correct diff without any timezone shift
     function calcResolutionTime(email) {
         if (!email.resolved_at || !email.created_at) return '—';
-        const received = new Date(email.email_date || email.created_at);
-        const resolved = new Date(email.resolved_at);
+        const receivedStr = email.email_date || email.created_at;
+        const resolvedStr = email.resolved_at;
+
+        // Parse as UTC to avoid local timezone shift (we only care about the diff)
+        const received = new Date(receivedStr + 'Z');
+        const resolved = new Date(resolvedStr + 'Z');
         if (isNaN(received.getTime()) || isNaN(resolved.getTime())) return '—';
 
         const diffMs = resolved.getTime() - received.getTime();
