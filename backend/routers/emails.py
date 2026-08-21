@@ -33,9 +33,18 @@ def receive_gmail_webhook(
     # Parse the date if provided
     email_date = None
     if payload.date:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"[WEBHOOK] Raw date received: {payload.date!r}")
+
         try:
-            # Try ISO format first (2026-08-20T10:00:00Z)
-            email_date = datetime.fromisoformat(payload.date.replace("Z", "+00:00"))
+            # Try ISO format first (2026-08-20T10:00:00Z or 2026-08-20T10:00:00+04:00)
+            raw = payload.date.strip()
+            if raw.endswith("Z"):
+                # Explicit UTC — convert to Dubai
+                email_date = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+            else:
+                email_date = datetime.fromisoformat(raw)
         except (ValueError, TypeError):
             try:
                 # Try RFC 2822 format (Fri, 21 Aug 2026 04:39:06 -0700)
@@ -43,19 +52,21 @@ def receive_gmail_webhook(
                 email_date = parsedate_to_datetime(payload.date)
             except (ValueError, TypeError):
                 try:
-                    # Try common formats
                     from dateutil import parser as dateparser
                     email_date = dateparser.parse(payload.date)
                 except Exception:
                     email_date = None
 
-        # Convert to Dubai time (UTC+4) for storage
+        # If date is timezone-aware, convert to Dubai time (UTC+4)
+        # If date is naive (no timezone), assume it's already correct local time
         if email_date is not None:
-            from datetime import timezone, timedelta
-            dubai = timezone(timedelta(hours=4))
             if email_date.tzinfo is not None:
+                from datetime import timezone, timedelta
+                dubai = timezone(timedelta(hours=4))
                 email_date = email_date.astimezone(dubai).replace(tzinfo=None)
-            # else: assume already local, keep as-is
+            # else: naive datetime — store as-is
+
+        logger.info(f"[WEBHOOK] Parsed email_date: {email_date}")
 
     email = Email(
         from_email=payload.from_email,
