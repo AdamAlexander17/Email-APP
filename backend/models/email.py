@@ -24,4 +24,4 @@ class Email(Base):
     status = Column(String(20), nullable=False, default="Pending")
     comment = Column(Text, nullable=True)
     resolved_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, nullable=False, default=_dubai_now)
+    created_at = Column(DateTime, nullable=False, default=_dubai_now, server_default=text("(CONVERT_TZ(NOW(), 'UTC', '+04:00'))"))

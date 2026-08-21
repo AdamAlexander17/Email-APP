@@ -18,5 +18,5 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     access_token = Column(Text, nullable=True)
     refresh_token = Column(Text, nullable=True)
-    created_at = Column(DateTime, nullable=False, default=_dubai_now)
-    updated_at = Column(DateTime, nullable=False, default=_dubai_now, onupdate=_dubai_now)
+    created_at = Column(DateTime, nullable=False, default=_dubai_now, server_default=text("(CONVERT_TZ(NOW(), 'UTC', '+04:00'))"))
+    updated_at = Column(DateTime, nullable=False, default=_dubai_now, onupdate=_dubai_now, server_default=text("(CONVERT_TZ(NOW(), 'UTC', '+04:00'))"))

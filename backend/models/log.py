@@ -17,4 +17,4 @@ class ActivityLog(Base):
     action = Column(String(100), nullable=False)
     details = Column(Text, nullable=True)
     ip_address = Column(String(45), nullable=True)
-    created_at = Column(DateTime, nullable=False, default=_dubai_now)
+    created_at = Column(DateTime, nullable=False, default=_dubai_now, server_default=text("(CONVERT_TZ(NOW(), 'UTC', '+04:00'))"))
