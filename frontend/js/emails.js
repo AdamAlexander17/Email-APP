@@ -137,16 +137,18 @@
         return email;
     }
 
-    // Format date with time in IST (already stored as IST in DB)
+    // Format date with time in Dubai (UTC+4)
     function formatDateTime(dateString) {
         if (!dateString) return '';
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return dateString;
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const mins = String(date.getMinutes()).padStart(2, '0');
+        // Add 4 hours for Dubai timezone (server stores UTC)
+        const dubai = new Date(date.getTime() + (4 * 60 * 60 * 1000));
+        const year = dubai.getUTCFullYear();
+        const month = String(dubai.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(dubai.getUTCDate()).padStart(2, '0');
+        const hours = String(dubai.getUTCHours()).padStart(2, '0');
+        const mins = String(dubai.getUTCMinutes()).padStart(2, '0');
         return `${year}-${month}-${day} ${hours}:${mins}`;
     }
 
