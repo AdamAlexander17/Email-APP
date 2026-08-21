@@ -300,8 +300,9 @@ a:hover {
 }
 
 .top-navbar .btn-logout:hover {
-  background: #e8e8e8;
-  border-color: #ccc;
+  background: #fef2f2;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 /* --- Main Content Area --- */

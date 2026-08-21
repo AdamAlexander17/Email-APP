@@ -5,7 +5,7 @@ Emails router for Gmail webhook and email listing endpoints.
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
@@ -49,12 +49,12 @@ def receive_gmail_webhook(
                 except Exception:
                     email_date = None
 
-        # Convert to IST (UTC+5:30) for storage
+        # Convert to Dubai time (UTC+4) for storage
         if email_date is not None:
             from datetime import timezone, timedelta
-            ist = timezone(timedelta(hours=5, minutes=30))
+            dubai = timezone(timedelta(hours=4))
             if email_date.tzinfo is not None:
-                email_date = email_date.astimezone(ist).replace(tzinfo=None)
+                email_date = email_date.astimezone(dubai).replace(tzinfo=None)
             # else: assume already local, keep as-is
 
     email = Email(
@@ -141,6 +141,7 @@ def delete_email(
 def update_email_comment(
     email_id: int,
     data: EmailCommentUpdate,
+    req: Request,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
@@ -154,7 +155,8 @@ def update_email_comment(
 
     from backend.routers.logs import log_activity
     username = current_user.get("username", "Unknown")
-    log_activity(db, username, "Email Resolved", f"Commented on email #{email_id}: {data.comment[:50]}")
+    client_ip = req.headers.get("X-Real-IP") or req.headers.get("X-Forwarded-For") or req.client.host
+    log_activity(db, username, "Email Resolved", f"Commented on email #{email_id}: {data.comment[:50]}", ip_address=client_ip)
 
     db.refresh(email)
     return email

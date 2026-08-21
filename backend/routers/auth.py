@@ -2,7 +2,7 @@
 Authentication router for login and token refresh endpoints.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from jose import JWTError
 from sqlalchemy.orm import Session
 
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(request: LoginRequest, db: Session = Depends(get_db)):
+def login(request: LoginRequest, req: Request, db: Session = Depends(get_db)):
     """
     Authenticate user and return access + refresh tokens.
 
@@ -46,8 +46,10 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     user.refresh_token = refresh_token
     db.commit()
 
+    # Log the login with IP address
     from backend.routers.logs import log_activity
-    log_activity(db, user.username, "User Login", f"User {user.username} logged in")
+    client_ip = req.headers.get("X-Real-IP") or req.headers.get("X-Forwarded-For") or req.client.host
+    log_activity(db, user.username, "User Login", f"User {user.username} logged in", ip_address=client_ip)
 
     return TokenResponse(
         access_token=access_token,
