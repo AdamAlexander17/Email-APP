@@ -1303,3 +1303,10 @@ a:hover {
   text-overflow: ellipsis;
   max-width: 140px;
 }
+
+/* --- Resolution Time Cell --- */
+.resolution-cell {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-primary);
+}

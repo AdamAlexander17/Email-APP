@@ -35,6 +35,7 @@ class EmailResponse(BaseModel):
     email_date: Optional[datetime]
     status: str
     comment: Optional[str]
+    resolved_at: Optional[datetime]
     created_at: datetime
 
 

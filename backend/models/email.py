@@ -16,4 +16,5 @@ class Email(Base):
     email_date = Column(DateTime, nullable=True)
     status = Column(String(20), nullable=False, default="Pending")
     comment = Column(Text, nullable=True)
+    resolved_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, nullable=False, server_default=text("(NOW() + INTERVAL 4 HOUR)"))

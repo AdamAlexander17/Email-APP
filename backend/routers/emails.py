@@ -151,6 +151,12 @@ def update_email_comment(
         raise HTTPException(status_code=404, detail="Email not found")
     email.comment = data.comment
     email.status = data.status or "Resolved"
+    if email.status == "Resolved" and email.resolved_at is None:
+        from datetime import datetime as dt, timezone, timedelta
+        dubai = timezone(timedelta(hours=4))
+        email.resolved_at = dt.now(dubai).replace(tzinfo=None)
+    elif email.status == "Pending":
+        email.resolved_at = None
     db.commit()
 
     from backend.routers.logs import log_activity

@@ -93,6 +93,7 @@
             const statusClass = (email.status || 'Pending') === 'Resolved' ? 'status-resolved' : 'status-pending';
             const statusText = email.status || 'Pending';
             const commentPreview = email.comment ? email.comment.substring(0, 30) + (email.comment.length > 30 ? '...' : '') : '—';
+            const resolutionTime = calcResolutionTime(email);
 
             return `
             <tr onclick="viewEmail(${email.id})" style="cursor: pointer;">
@@ -111,6 +112,7 @@
                 <td>${attachmentHtml}</td>
                 <td class="comment-cell">${escapeHtml(commentPreview)}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td class="resolution-cell">${resolutionTime}</td>
                 <td>${dateStr}</td>
                 <td class="actions-cell">
                     <button class="action-icon" title="Comment" onclick="event.stopPropagation(); openCommentModal(${email.id}, '${escapeAttr(email.comment || '')}', '${escapeAttr(email.status || 'Pending')}')">
@@ -364,6 +366,31 @@
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    // Calculate resolution time between email received and resolved
+    function calcResolutionTime(email) {
+        if (!email.resolved_at || !email.created_at) return '—';
+        const received = new Date(email.email_date || email.created_at);
+        const resolved = new Date(email.resolved_at);
+        if (isNaN(received.getTime()) || isNaN(resolved.getTime())) return '—';
+
+        const diffMs = resolved.getTime() - received.getTime();
+        if (diffMs < 0) return '—';
+
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffDays > 0) {
+            const remainHours = diffHours % 24;
+            return `${diffDays}d ${remainHours}h`;
+        } else if (diffHours > 0) {
+            const remainMins = diffMins % 60;
+            return `${diffHours}h ${remainMins}m`;
+        } else {
+            return `${diffMins}m`;
+        }
     }
 
     function countAttachments(attachmentData) {
