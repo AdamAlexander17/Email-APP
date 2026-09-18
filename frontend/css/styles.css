@@ -469,9 +469,10 @@ a:hover {
 
 /* Toolbar layout like screenshot */
 .toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .toolbar-right {
@@ -1327,4 +1328,65 @@ th[data-sort]:hover .sort-icon {
 }
 th[data-sort] {
   user-select: none;
+}
+
+
+
+/* ================================
+   Email Filters
+   ================================ */
+
+.filter-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filter-icon {
+    position: absolute;
+    left: 12px;
+    z-index: 2;
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+    pointer-events: none;
+}
+
+.email-filter {
+    height: 38px;
+    min-width: 145px;
+    padding: 0 32px 0 32px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+
+    background-color: var(--color-surface);
+    color: var(--color-text);
+
+    font-family: var(--font-family);
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    cursor: pointer;
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.email-filter:hover {
+    border-color: var(--color-primary);
+}
+
+.email-filter:focus {
+    border-color: var(--color-primary);
+
+    box-shadow:
+        0 0 0 3px rgba(74, 144, 217, 0.12);
+}
+
+.email-filter option {
+    background: var(--color-surface);
+    color: var(--color-text);
 }

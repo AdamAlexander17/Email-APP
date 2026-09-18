@@ -52,12 +52,32 @@
         <!-- Email Table Container -->
         <div class="table-container">
             <div class="table-toolbar">
-                <div class="toolbar-left">
+                <div class="toolbar-left">        
                     <div class="search-wrapper">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
                         <input type="text" class="search-input" id="search-input" placeholder="Search emails...">
                     </div>
-                </div>
+
+                            <!-- STATUS FILTER -->
+                            <div class="filter-wrapper">
+                                <i class="fa-solid fa-filter filter-icon"></i>
+                                <select id="status-filter" class="email-filter">
+                                    <option value="All">All Status</option>
+                                    <option value="Pending" selected>Pending</option>
+                                    <option value="Resolved">Resolved</option>
+                                </select>
+                            </div>
+
+                            <!-- BRAND FILTER -->
+                            <div class="filter-wrapper">
+                                <i class="fa-solid fa-building filter-icon"></i>
+                                <select id="brand-filter" class="email-filter">
+                                    <option value="All" selected>All Brands</option>
+                                    <option value="TradeKaro">TradeKaro</option>
+                                    <option value="TradeBazaar">TradeBazaar</option>
+                                    <option value="BazaarFX">BazaarFX</option>
+                                </select>
+                            </div>
                 <div class="toolbar-right">
                     <span class="rows-label">Rows</span>
                     <select class="page-size-select" id="page-size-select">
